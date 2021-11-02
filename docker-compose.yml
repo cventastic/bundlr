@@ -1,0 +1,49 @@
+version: '3.5'
+
+services:
+
+  bundlr:
+    build:
+      context: ./build
+      dockerfile: Dockerfile
+    networks:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: bundlr
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: bundlr
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    expose:
+      - 5432
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  redis:
+    container_name: redis
+    image: redis:6.2.6
+    volumes:
+       - redis:/data
+    expose:
+      - 6379
+    networks:
+      - redis
+    restart: unless-stopped
+  
+networks:
+  postgres:
+    driver: bridge
+  redis:
+    driver: bridge
+
+volumes:
+    postgres:
+    redis:
